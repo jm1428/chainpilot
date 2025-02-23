@@ -1,0 +1,570 @@
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, ChevronDown, TrendingUp, Wallet, Users, Brain } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+
+const App = () => {
+  const [currentScreen, setCurrentScreen] = useState('intro');
+  const [formData, setFormData] = useState({
+    email: '',
+    code: '',
+    username: ''
+  });
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [selectedWallets, setSelectedWallets] = useState([]);
+
+  // Progress Circle Component
+  const ProgressCircle = ({ step }) => {
+    const calculateRotation = (step) => {
+      switch(step) {
+        case 1: return 120;
+        case 2: return 240;
+        case 3: return 360;
+        default: return 0;
+      }
+    };
+
+    return (
+      <div style={{
+        width: '64px',
+        height: '64px',
+        position: 'relative'
+      }}>
+        <div style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          border: '4px solid #e5e5e5',
+          position: 'absolute'
+        }} />
+        <div style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          position: 'absolute',
+          clipPath: 'circle(50%)',
+          transform: 'rotate(-90deg)',
+          background: `conic-gradient(
+            #00C805 0deg ${calculateRotation(step)}deg,
+            transparent ${calculateRotation(step)}deg 360deg
+          )`
+        }} />
+      </div>
+    );
+  };
+
+  // Intro Screen
+  const IntroScreen = () => {
+    const walletData = [
+      { name: 'GCR', type: 'Smart Whale', profit: '+$100M', winRate: '80%' },
+      { name: 'Jump Capital', type: 'Institution', profit: '+$500M', winRate: '65%' },
+      { name: 'Frank DeGods', type: 'KOL', profit: '+$7M', winRate: '70%' },
+      { name: 'Anon smart wallet', type: 'Whale', profit: '+$200K', winRate: '100%' }
+    ];
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -100 }}
+        className="min-h-screen bg-white p-6 relative pb-24"
+      >
+        <div className="text-center mt-16">
+          <h1 className="text-4xl font-extrabold leading-tight mb-4">
+            Invest like an Insider
+          </h1>
+          <p className="text-xl text-gray-600">
+            + hedge funds, and more
+          </p>
+        </div>
+
+        <div className="mt-8">
+          {walletData.map((wallet, index) => (
+            <div
+              key={index}
+              className="py-3 border-b border-gray-100 flex justify-between"
+            >
+              <div>
+                <div className="font-medium">{wallet.name}</div>
+                <div className="text-sm text-gray-500">{wallet.type}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[#00C805] font-medium">{wallet.profit}</div>
+                <div className="text-sm text-gray-500">Win rate {wallet.winRate}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="absolute bottom-8 left-6 right-6">
+          <button
+            onClick={() => setCurrentScreen('email')}
+            className="w-full bg-[#00C805] text-white py-4 rounded-xl font-medium"
+          >
+            Explore Popular Wallets
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // Email Screen
+  const EmailScreen = () => (
+    <motion.div
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className="min-h-screen bg-white p-6 relative pb-24"
+    >
+      <button
+        onClick={() => setCurrentScreen('intro')}
+        className="flex items-center text-[#00C805] font-medium"
+      >
+        <ChevronLeft className="w-6 h-6" />
+        Back
+      </button>
+
+      <div className="mt-24 flex flex-col items-center">
+        <ProgressCircle step={1} />
+        
+        <h1 className="text-2xl font-bold mt-12 text-center">
+          Enter your email
+        </h1>
+        <p className="text-gray-500 mt-3 text-center">
+          We'll use this to create your account
+        </p>
+
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          placeholder="Email"
+          className="w-full p-4 mt-12 bg-gray-100 rounded-xl text-lg outline-none"
+        />
+
+        <p className="text-sm text-gray-500 mt-4 text-center">
+          By continuing, you agree to our{' '}
+          <span className="text-[#00C805] underline">Terms of Service</span>
+          {' '}and{' '}
+          <span className="text-[#00C805] underline">Privacy Policy</span>
+        </p>
+      </div>
+
+      <div className="absolute bottom-8 left-6 right-6">
+        <button
+          onClick={() => setCurrentScreen('verify')}
+          className="w-full bg-[#00C805] text-white py-4 rounded-xl font-medium"
+        >
+          Continue
+        </button>
+      </div>
+    </motion.div>
+  );
+
+  // Continuing in next message...
+
+// Verify Screen
+  const VerifyScreen = () => (
+    <motion.div
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className="min-h-screen bg-white p-6 relative pb-24"
+    >
+      <button
+        onClick={() => setCurrentScreen('email')}
+        className="flex items-center text-[#00C805] font-medium"
+      >
+        <ChevronLeft className="w-6 h-6" />
+        Back
+      </button>
+
+      <div className="mt-24 flex flex-col items-center">
+        <ProgressCircle step={2} />
+        
+        <h1 className="text-2xl font-bold mt-12 text-center">
+          Verify your email
+        </h1>
+        <p className="text-gray-500 mt-3 text-center">
+          Enter the 6 digit code we sent you<br />
+          <span>({formData.email})</span>
+        </p>
+
+        <input
+          type="text"
+          value={formData.code}
+          onChange={(e) => setFormData({...formData, code: e.target.value})}
+          placeholder="Confirmation Code"
+          maxLength={6}
+          className="w-full p-4 mt-12 bg-gray-100 rounded-xl text-lg outline-none"
+        />
+      </div>
+
+      <div className="absolute bottom-8 left-6 right-6">
+        <button
+          onClick={() => setCurrentScreen('username')}
+          className="w-full bg-[#00C805] text-white py-4 rounded-xl font-medium"
+        >
+          Continue
+        </button>
+      </div>
+    </motion.div>
+  );
+
+  // Username Screen
+  const UsernameScreen = () => (
+    <motion.div
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className="min-h-screen bg-white p-6 relative pb-24"
+    >
+      <button
+        onClick={() => setCurrentScreen('verify')}
+        className="flex items-center text-[#00C805] font-medium"
+      >
+        <ChevronLeft className="w-6 h-6" />
+        Back
+      </button>
+
+      <div className="mt-24 flex flex-col items-center">
+        <ProgressCircle step={3} />
+        
+        <h1 className="text-2xl font-bold mt-12 text-center">
+          Create username
+        </h1>
+        <p className="text-gray-500 mt-3 text-center">
+          This will be your unique identity
+        </p>
+
+        <input
+          type="text"
+          value={formData.username}
+          onChange={(e) => setFormData({...formData, username: e.target.value})}
+          placeholder="Username"
+          className="w-full p-4 mt-12 bg-gray-100 rounded-xl text-lg outline-none"
+        />
+      </div>
+
+      <div className="absolute bottom-8 left-6 right-6">
+        <button
+          onClick={() => setCurrentScreen('success')}
+          className="w-full bg-[#00C805] text-white py-4 rounded-xl font-medium"
+        >
+          Continue
+        </button>
+      </div>
+    </motion.div>
+  );
+
+  // Success Screen
+  const SuccessScreen = () => {
+    React.useEffect(() => {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }
+        });
+      }, 250);
+
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-white p-6 flex flex-col items-center justify-center relative pb-24"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="w-20 h-20 bg-[#00C805] rounded-full flex items-center justify-center mb-8"
+        >
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+            <motion.path
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5 }}
+              d="M20 6L9 17L4 12"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </motion.div>
+
+        <motion.h1
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-3xl font-bold text-center mb-4"
+        >
+          Welcome {formData.username}!
+        </motion.h1>
+
+        <motion.p
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-gray-500 text-center mb-12"
+        >
+          Your account is ready to go
+        </motion.p>
+
+        <div className="absolute bottom-8 left-6 right-6">
+          <motion.button
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            onClick={() => setCurrentScreen('portfolios')}
+            className="w-full bg-[#00C805] text-white py-4 rounded-xl font-medium"
+          >
+            Continue to Dashboard
+          </motion.button>
+        </div>
+      </motion.div>
+    );
+  };
+
+  // Continuing with Portfolio Screen in next message...
+
+// Portfolio Screen
+  const PortfolioScreen = () => {
+    const categories = [
+      {
+        id: 'institutional',
+        title: 'Institutional Investors',
+        icon: <TrendingUp />,
+        description: 'Top performing hedge funds and VCs',
+        stats: '45+ Portfolios',
+        avgReturn: '+65%',
+        portfolios: [
+          {
+            id: 'jump1',
+            name: 'Jump Trading',
+            type: 'Quant Fund',
+            profit: '+$500M',
+            winRate: '72%',
+            trades: '150+'
+          },
+          {
+            id: 'poly1',
+            name: 'Polychain Capital',
+            type: 'Crypto Fund',
+            profit: '+$300M',
+            winRate: '68%',
+            trades: '90+'
+          }
+        ]
+      },
+      {
+        id: 'whales',
+        title: 'Crypto Whales',
+        icon: <Wallet />,
+        description: 'Large-scale crypto traders',
+        stats: '20+ Portfolios',
+        avgReturn: '+82%',
+        portfolios: [
+          {
+            id: 'whale1',
+            name: 'Genesis Trading',
+            type: 'Market Maker',
+            profit: '+$200M',
+            winRate: '82%',
+            trades: '300+'
+          }
+        ]
+      },
+      {
+        id: 'kols',
+        title: 'KOLs & Influencers',
+        icon: <Users />,
+        description: 'Verified crypto experts',
+        stats: '30+ Portfolios',
+        avgReturn: '+48%',
+        portfolios: [
+          {
+            id: 'kol1',
+            name: 'CryptoGuru',
+            type: 'Analyst',
+            profit: '+$15M',
+            winRate: '70%',
+            trades: '120+'
+          }
+        ]
+      },
+      {
+        id: 'smart',
+        title: 'Smart Wallets',
+        icon: <Brain />,
+        description: 'High-win-rate traders',
+        stats: '25+ Portfolios',
+        avgReturn: '+73%',
+        portfolios: [
+          {
+            id: 'smart1',
+            name: 'Alpha Seeker',
+            type: 'Smart Money',
+            profit: '+$5M',
+            winRate: '85%',
+            trades: '400+'
+          }
+        ]
+      }
+    ];
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -100 }}
+        className="min-h-screen bg-white p-6 relative pb-32"
+      >
+        <h1 className="text-2xl font-bold mb-2">Portfolios</h1>
+        <p className="text-gray-500 mb-8">Choose portfolios to copy trade</p>
+
+        <div className="space-y-4 mb-24">
+          {categories.map((category) => (
+            <div key={category.id}>
+              <div
+                className="bg-white rounded-xl p-4 cursor-pointer border border-gray-100 shadow-sm"
+                onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-gray-50 rounded-xl">
+                      {category.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{category.title}</h3>
+                      <p className="text-sm text-gray-500">{category.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-[#00C805]">{category.avgReturn}</p>
+                      <p className="text-xs text-gray-400">{category.stats}</p>
+                    </div>
+                    {expandedCategory === category.id ? (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {expandedCategory === category.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-2 space-y-2"
+                >
+                  {category.portfolios.map((portfolio) => (
+                    <div
+                      key={portfolio.id}
+                      className={`ml-12 mb-3 p-4 rounded-xl ${
+                        selectedWallets.includes(portfolio.id) 
+                          ? 'bg-green-50 border border-green-200' 
+                          : 'bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold">{portfolio.name}</h3>
+                            <span className="text-xs px-2 py-1 bg-gray-200 rounded-xl">
+                              {portfolio.type}
+                            </span>
+                          </div>
+                          <div className="mt-2">
+                            <div className="text-sm">
+                              <span className="text-gray-500">Win Rate: </span>
+                              <span className="text-[#00C805]">{portfolio.winRate}</span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-gray-500">Trades: </span>
+                              {portfolio.trades}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[#00C805] font-semibold">{portfolio.profit}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedWallets(prev => 
+                                prev.includes(portfolio.id)
+                                  ? prev.filter(id => id !== portfolio.id)
+                                  : [...prev, portfolio.id]
+                              );
+                            }}
+                            className={`mt-2 px-4 py-1 rounded-xl text-sm font-medium ${
+                              selectedWallets.includes(portfolio.id)
+                                ? 'bg-[#00C805] text-white'
+                                : 'bg-white border border-[#00C805] text-[#00C805]'
+                            }`}
+                          >
+                            {selectedWallets.includes(portfolio.id) ? 'Selected' : 'Select'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {selectedWallets.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-6">
+            <div className="max-w-md mx-auto flex justify-between items-center">
+              <div>
+                <p className="font-medium">{selectedWallets.length} portfolios selected</p>
+                <p className="text-sm text-gray-500">Estimated return: +67% / year</p>
+              </div>
+              <button className="bg-[#00C805] text-white px-6 py-3 rounded-xl font-medium w-[160px]">
+                Start Copying
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    );
+  };
+
+  // Main component return
+  return (
+    <div className="max-w-md mx-auto">
+      <AnimatePresence mode="wait">
+        {currentScreen === 'intro' && <IntroScreen />}
+        {currentScreen === 'email' && <EmailScreen />}
+        {currentScreen === 'verify' && <VerifyScreen />}
+        {currentScreen === 'username' && <UsernameScreen />}
+        {currentScreen === 'success' && <SuccessScreen />}
+        {currentScreen === 'portfolios' && <PortfolioScreen />}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default App;
